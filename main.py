@@ -60,8 +60,7 @@ except Exception as e:
     log.error("Error: config.json is not valid")
     exit(1)
 
-HEADER_MSG = getenv("HEADER_MSG", "**Telegram Bot Status :**")
-FOOTER_MSG = getenv("FOOTER_MSG", "_Join FZX Paradox at @FZXParadox_\n**Repo :** __https://github.com/SilentDemonSD/TgBotStatus__")
+HEADER_MSG = getenv("HEADER_MSG", "📈 | **Real-Time Bot Status**")
 TIME_ZONE = getenv("TIME_ZONE", "Asia/Kolkata")
 
 log.info("Connecting pyroBotClient")
@@ -139,13 +138,13 @@ async def check_bots():
     totalBotsCount = len(bots.keys())
     log.info("Starting Periodic Bot Status checks...")
     
-    header_msg = f"__**{HEADER_MSG}**__\n\n"
-    status_message = header_msg + """• **Avaliable Bots :** __Checking...__
+    header_msg = f"{HEADER_MSG}\n\n"
+    status_message = header_msg + """• **Avaliable Bots :** Checking...
 
-• `Currently Ongoing Periodic Check`
+  `Currently ongoing periodic check...`
 
 """
-    await editStatusMsg(status_message + f"""**• Status Update Stats:**
+    await editStatusMsg(status_message + f"""**Status Updating:**
 ┌ **Bots Verified :** 0 out of {totalBotsCount}
 ├ **Progress :** [○○○○○○○○○○] 0%
 └ **Time Elasped :** 0s""")
@@ -185,7 +184,7 @@ async def check_bots():
         log.info(f"Checked {bdata['bot_uname']} & Status : {bot_stats[bot]['status']}.")
         bot_no += 1
         
-        await editStatusMsg(status_message + f"""**Status Update Stats:**
+        await editStatusMsg(status_message + f"""**Status Updating:**
 ┌ **Bots Checked :** {bot_no} out of {totalBotsCount}
 ├ **Progress :** {progress_bar(bot_no, totalBotsCount)}
 └ **Time Elasped :** {get_readable_time(time() - start_time)}""")
@@ -195,7 +194,7 @@ async def check_bots():
 
     status_message = header_msg + f"• **Avaliable Bots :** {avl_bots} out of {totalBotsCount}\n\n"
     for bot in bot_stats.keys():
-        status_message += f"┌ **Bot :** {await bot_info(bot_stats[bot]['bot_uname'])}\n├ **Username :** {bot_stats[bot]['bot_uname']}\n"
+        status_message += f"┌ **Bot :** {await bot_info(bot_stats[bot]['bot_uname'])}\n├ **Username :** @{bot_stats[bot]['bot_uname']}\n"
         if (stdata := bot_stats[bot].get('status_data')):
             try:
                 status_message += f'├ **Commit Date :** {stdata["commit_date"]}\n'
@@ -225,17 +224,12 @@ async def check_bots():
 """
 
     total_time = end_time - start_time
-    status_message += f"• **Last Periodic Checked in {round(total_time, 2)}s**\n\n"
+    status_message += f"Last periodic check completed in {round(total_time, 2)}s\n\n"
     
     current_time = datetime.now(utc).astimezone(timezone(TIME_ZONE))
-    status_message += f"""• **Last Check Details :**
-┌ **Time :** `{current_time.strftime('%H:%M:%S')} hrs`
-├ **Date :** `{current_time.strftime('%d %B %Y')}`
-└ **Time Zone :** `{TIME_ZONE} (UTC {current_time.strftime('%z')})`
-
-__• Auto Status Update in 5 mins Interval__
-
-{FOOTER_MSG}"""
+    status_message += f"""⏰ **Last updated on :**
+`{current_time.strftime('%d %B %Y')}` | `{current_time.strftime('%H:%M:%S')}` hrs
+{TIME_ZONE} (UTC {current_time.strftime('%z')})"""
     await editStatusMsg(status_message)
 
 async def main():
